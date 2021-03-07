@@ -37,12 +37,14 @@ log_data/2018/11/2018-11-13-events.json
 
 ## ETL Pipeline
 1. Configure and load AWS credentials (dl.cfg):
-> AWS_ACCESS_KEY_ID     = YOUR_AWS_ACCESS_KEY_ID
-> AWS_SECRET_ACCESS_KEY = YOUR_AWS_SECRET_ACCESS_KEY
-> INPUT_DATA            = s3://<YOUR_BUCKET_NAME>/
-> OUTPUT_DATA           = s3://<YOUR_BUCKET_NAME>/output_data/
-> INPUT_SONG_DATA       = s3://<YOUR_BUCKET_NAME>/song_data/*/*/*/*.json
-> INPUT_LOG_DATA        = s3://<YOUR_BUCKET_NAME>/log_data/*/*/*.json
+```
+AWS_ACCESS_KEY_ID     = YOUR_AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = YOUR_AWS_SECRET_ACCESS_KEY
+INPUT_DATA            = s3://<YOUR_BUCKET_NAME>/
+OUTPUT_DATA           = s3://<YOUR_BUCKET_NAME>/output_data/
+INPUT_SONG_DATA       = s3://<YOUR_BUCKET_NAME>/song_data/*/*/*/*.json
+INPUT_LOG_DATA        = s3://<YOUR_BUCKET_NAME>/log_data/*/*/*.json
+```
 
 2. Run ETL Script using command line ```python3 etl.py```
 Steps:
