@@ -15,8 +15,8 @@ config = configparser.ConfigParser()
 config.read('dl.cfg')
 
 # configure aws access keys
-os.environ['AWS_ACCESS_KEY_ID'] = config['AWS_ACCESS_KEY_ID']
-os.environ['AWS_SECRET_ACCESS_KEY'] = config['AWS_SECRET_ACCESS_KEY']
+os.environ['AWS_ACCESS_KEY_ID'] = config['AWS']['AWS_ACCESS_KEY_ID']
+os.environ['AWS_SECRET_ACCESS_KEY'] = config['AWS']['AWS_SECRET_ACCESS_KEY']
 
 def create_spark_session():
     """
@@ -66,7 +66,7 @@ def process_song_data(spark, input_data, output_data, run_start_time):
     songs_table.show(5, truncate=False)
 
     # write songs table to parquet files partitioned by year and artist
-    songs_table_path = f"{output_data}songs_table_{run_start_time}"
+    songs_table_path = f"{output_data}/songs-{run_start_time}"
 
     # write df to spark parquet file (partitioned by year and artist_id)
     print(f"writing songs_table parquet files to {songs_table_path}...")
@@ -92,7 +92,7 @@ def process_song_data(spark, input_data, output_data, run_start_time):
     artists_table.show(5, truncate=False)
 
     # write artists table to parquet files
-    artists_table_path = f"{output_data}artists_table_{run_start_time}"
+    artists_table_path = f"{output_data}/artists-{run_start_time}"
 
     print(f"writing artists_table parquet files to {artists_table_path}...")
     songs_table.write.mode("overwrite").parquet(artists_table_path)
@@ -142,7 +142,7 @@ def process_log_data(spark, input_data_ld, input_data_sd, output_data, run_start
     users_table.show(5)
 
     # write users table to parquet files
-    users_table_path = f"{output_data}users_table_{run_start_time}"
+    users_table_path = f"{output_data}/users-{run_start_time}"
     print(f"writing users_table parquet files to {users_table_path}...")
     users_table.write.mode("overwrite").parquet(users_table_path)
     stop_ut = datetime.now()
@@ -190,7 +190,7 @@ def process_log_data(spark, input_data_ld, input_data_sd, output_data, run_start
     time_table.show(5)
 
     # write time table to parquet files partitioned by year and month
-    time_table_path = f"{output_data}time_table_{run_start_time}"
+    time_table_path = f"{output_data}/time-{run_start_time}"
 
     print(f"writing time_table parquet files to {time_table_path}...")
     time_table.write.mode("overwrite").partitionBy("year", "month").parquet(time_table_path)
@@ -238,7 +238,7 @@ def process_log_data(spark, input_data_ld, input_data_sd, output_data, run_start
     songplays_table.show(5, truncate=False)
 
     # write songplays table to parquet files partitioned by year and month
-    songplays_table_path = f"{output_data}songplays_table_{run_start_time}"
+    songplays_table_path = f"{output_data}/songplays-{run_start_time}"
 
     print("writing songplays_table parquet files to {songplays_table_path}...")
     time_table.write.mode("overwrite").partitionBy("year", "month")\
@@ -320,18 +320,22 @@ def main():
     print(f"\npipeline started at {run_start_time}\n")
 
     spark = create_spark_session()
-    # input_data = "s3a://udacity-dend/"
-    # output_data = "s3a://udacity-dend/output_data"
 
-    # Process data from s3 or in local directory
-    input_data_song = config['INPUT_DATA_SONG']
-    input_data_log = config['INPUT_DATA_LOG']
-    output_data = config['OUTPUT_DATA']
+    # uncomment to execute etl in aws s3
+    #input_data_song = config['AWS']['INPUT_DATA_SONG']
+    #input_data_log = config['AWS']['INPUT_DATA_LOG']
+    #output_data = config['AWS']['OUTPUT_DATA']
+
+    # uncomment to execute etl in local mode
+    input_data_song = config['LOCAL']['INPUT_DATA_SONG']
+    input_data_log = config['LOCAL']['INPUT_DATA_LOG']
+    output_data = config['LOCAL']['OUTPUT_DATA']
 
     songs_table, artists_table = process_song_data( spark, \
                                                     input_data_song, \
                                                     output_data, \
                                                     run_start_time)
+    
     users_table, time_table, songplays_table = process_log_data(spark, \
                                                                 input_data_log, \
                                                                 input_data_song, \
